@@ -1,0 +1,644 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ja"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS"><title>Lua/A.I.M.S.　リファレンスマニュアル</title>
+
+<link href="doc.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<h1>Lua/A.I.M.S. リファレンスマニュアル</h1>
+<h2 class="important">はじめに</h2>
+<ul>
+<li>Luaそのものの言語仕様については<a href="http://www.uri.sakura.ne.jp/%7Ecosmic/yuno/lab/lua5_manual_ja.html">Lua
+5.0リファレンスマニュアル</a>を参照のこと。(リンク先は非公式日本語訳)</li>
+<li><strong>角度はmathモジュールを除いてdegree(0～360)。mathモジュールには
+deg⇔rad変換関数があるので活用されたい。画面に向かってX軸の+方向が0度。そこから時計回りが正の角度。</strong></li>
+<li>速度・加速度はすべてピクセル/フレーム。</li>
+<li>ここにある関数群のほかにLua本体で提供されるモジュールが使えます。</li>
+<li>パック済みファイル対応のrequire命令として「<strong>prequire(filename)</strong>」
+命令を準備しています。require命令の代わりにこちらを利用してください。</li>
+<li>各命令の表記の意味は次の通り：<span class="implemented">実装検証済み</span>　<span class="untested">実装済み未検証</span>　<span class="unimplemented">未実装(実装途上)</span>　<span class="obsolete">今後の使用非推奨</span>(互換性のために残してある)</li>
+<li>タイルマップライブラリ、ASCIIフォント関連関数、文字列入力関数など一部は未掲載。</li>
+</ul>
+<h2>全体の概要</h2>
+<h3>スクリプトの構成</h3>
+<p>スクリプトの内容は次のようになる。</p>
+<pre>function OnLoad()<br> -- ステージの読み込み時の処理<br>end<br><br><br>function [SCENENAME]_OnStart()<br> -- シーンの初期化処理<br>end<br> <br>function [SCENENAME]_OnStep()<br> -- シーンのフレームごとの処理　1フレに1回呼ばれる<br>end<br> <br>function [SCENENAME]_OnClose()<br> -- シーンの終了時の処理<br>end<br><br>function OnVanish()<br> -- メモリ解放時の処理<br>end<br><br>function [CLASS_NAME]_OnStart()<br> -- アクター(いわゆるスプライト)の初期化時処理<br>end<br> <br>function [CLASS_NAME]_OnStep()<br> -- アクターのフレームごとの処理　1フレに1回呼ばれる<br>end<br> <br>function [CLASS_NAME]_OnVanish(cause)<br> -- アクターの消滅時の処理 cause=消滅理由<br>end<br><br>……あとは任意個数繰り返し</pre>
+<h3>スクリプトの動作</h3>
+<p>システムがスクリプトを読み込む際、まずOnLoad関数が呼ばれる。ここで読み込みの際一度だけ実行すべき処理を行う(画像・音声
+ファイル読み込みなど)。</p>
+<p>そのあと、まずはboot_OnStart関数が呼ばれ、以降1フレームごとにboot_OnStep関数が呼ばれる。<br>
+シーンが自らシーンの終了を宣言(closeScene関数)した場合、または他のシーンへの移行を行う(changeScene関数)場合、
+OnClose関数が呼ばれる。</p>
+<p>アクターの制御ルーチンは各アクターに対して個別に関連付けられる。複数のアクターに同一クラスを指定してもよい。</p>
+<p>スクリプト内において、変数はlocal宣言しない限り共通となる。各アクターで値を保持したい場合は専用の値スロットがある。システ
+ムでの定義済み変数 VAR[0～71] を介して読み書き可能。他のアクターの値の読み書きはsetv()とgetv()で可能。</p>
+<h2>アクタースクリプト部</h2>
+<h3>構成</h3>
+<pre>function [CLASS_NAME]_OnStart()<br> -- アクターの初期化処理<br>end<br> <br>function [CLASS_NAME]_OnStep()<br> -- アクターのフレームごとの処理　1フレに1回呼ばれる<br>end<br> <br>function [CLASS_NAME]_OnVanish(cause)<br> -- アクターの消滅時の処理 cause=消滅理由<br>end<br></pre>
+<h3>関数</h3>
+<h4>生成、消去命令</h4>
+<h5 class="implemented">hActor = createActor
+(hImage,x,y,angle,speed,layer,"class")<br>
+hActor = createActor (hImage,x,y,angle,speed,layer)<br>
+hActor = createActor (hImage,x,y,layer,"class")<br>
+hActor = createActor (hImage,x,y,layer)</h5>
+<p> アクターを生成する。戻り値はget～/is～系の命令で引数
+hActortargetとして与えることができるアクター固有番号。 </p>
+<ul>
+<li>hImage = 使用するグラフィックハンドル。</li>
+<li>x,y = 座標。ステージ制御部で呼ぶときは絶対座標。アクター制御部で呼ぶときはそのアクターとの相対座標。</li>
+<li>angle = 初期方角。</li>
+<li>speed = 初速。</li>
+<li>layer = 生成先のレイヤー。0～7。それぞれでアクターの取り扱いが異なっている点に注意。</li>
+<li>class=クラス名。指定しない場合、アクターのスクリプト制御は行わない。</li>
+</ul>
+<p>アクターには「見た目の向き」と「移動方向」の2つの角度が格納されているが、この二値は<strong>createActor
+の呼び出し方式で同期、非同期が変化する</strong>ことに注意。</p>
+<ul>
+<li>angleとspeedを指定した場合 … 移動方向と見た目の向きは同期する。</li>
+<li>angleとspeedを省略した場合 … 移動方向と見た目の向きは<strong>同期しない。</strong></li>
+</ul>
+<p>また、移動方向と見た目の同期は次のタイミングで行われる。</p>
+<ul>
+<li>アクターの生成。</li>
+<li>Turn、Accel、setSpeed、setAngle関数の呼び出しでアクターの移動ベクトルが更新された場合。</li>
+<li>moverによってアクターの移動ベクトルが更新された場合。</li>
+</ul>
+<p>※setVector関数やMOVER_SETVECTOR、MOVER_ADDVECTORのように、移動ベクトルをX,Y成分で直
+接指定する場合には同期が起こらないことに留意すること。</p>
+<p>同期、非同期の設定は setHeadSync 命令で後から変更することが可能。</p>
+<p>addMoverの命令については「<span style="text-decoration: underline;"></span><a href="#addMover">軌道設定命令</a>」を参照のこと。</p>
+<h5 class="implemented"> vanish ([hActor])<br>
+addMover(hActor, -1, 1, MOVER_VANISH)
+</h5>
+<p>指定したアクターを消滅させる。hActorを省略すると自分自身を消去。</p>
+<h4>アクター操作命令</h4>
+<h5 class="implemented"> setPos (x,y)<br>
+addMover(hActor, -1, 1, MOVER_SETPOSITION, x, y)
+</h5>
+<p> x,y座標を直接設定。 nilを入れると変更なし。</p>
+<h5 class="untested">setZ (z)</h5>
+<p>高速描画レイヤーにおける描画順のキーになるZ値を設定。正の値でも負の値でもよいが、あまり極端な値にすると描画されなくなるので注
+意すること。</p>
+<h5 class="implemented"> setVector (vx,vy)<br>
+addMover(hActor, -1, 1, MOVER_SETVECTOR, vx, vy)
+</h5>
+<p>x,y速度を直接指定。nilを入れると変更なし。</p>
+<h5 class="implemented"> setSpeed (speed)<br>
+addMover(hActor, -1, 1, MOVER_SETSPEED, speed)
+</h5>
+<p> 移動速度を設定。呼ぶとSetAngleで指定した方向に向けて設定した速度で移動を開始する。</p>
+<h5 class="implemented"> setAngle (angle)<br>
+addMover(hActor, -1, 1, MOVER_SETANGLE, angle)
+</h5>
+<p> 移動角度を設定。呼ぶと SetSpeedで指定した速度で設定した角度に向けて移動を開始する。</p>
+<h5 class="implemented">x, y = makevector(ang, spd)</h5>
+<p> 指定した角度、スピードのベクトル値を返す。</p>
+<p><strong>※common.luaで定義</strong></p>
+<h5 class="implemented">ang, spd = getFromVector(actor)</h5>
+<p> 指定したアクターの保持するベクトル情報から、角度、スピードを返す。</p>
+<p><strong>※common.luaで定義</strong></p>
+<h5 class="implemented">ang = getAngleFromVector(actor)</h5>
+<p> 指定したアクターの保持するベクトル情報から、角度を返す。</p>
+<p><strong>※common.luaで定義</strong></p>
+<h5 class="implemented">spd = getSpeedFromVector(actor)</h5>
+<p> 指定したアクターの保持するベクトル情報から、スピードを返す。</p>
+<p><strong>※common.luaで定義</strong></p>
+<h5 class="implemented"> turn (dangle)<br>
+addMover(hActor, -1, 1, MOVER_TURN, dangle)
+</h5>
+<p>直ちに回転させる。</p>
+<h5 class="implemented"> setHeading (angle)<br>
+addMover(hActor, -1, 1, MOVER_SETHEADING, angle)
+</h5>
+<p> 見た目の向きを設定。呼んでも移動方向に影響はしない。</p>
+<h5 class="implemented"> turnHeading (dangle)<br>
+addMover(hActor, -1, 1, MOVER_TURNHEADING, dangle)
+</h5>
+<p>向きを直ちに回転させる。</p>
+<h5 class="implemented"> setHeadSync (flag)<br>
+addMover(hActor, -1, 1, MOVER_SETHEADSYNC, flag)
+</h5>
+<p>移動方向と見た目の向きを常にシンクロさせる。trueで常時一致、falseで分離。初期値はtrueになっている。</p>
+<h5 class="implemented"> accel (dspeed)<br>
+addMover(hActor, -1, 1, MOVER_ACCEL, dspeed)
+</h5>
+<p>直ちに加(減)速させる。</p>
+<h5 class="implemented"> setAnimePlay (flag)<br>
+addMover(hActor, -1, 1, MOVER_SETANIMEPLAY, flag)
+</h5>
+<p>自動チップアニメーションを有効/無効にする。trueで有効、falseで無効。</p>
+<h5 class="untested"> setPattern (hImage)<br>
+addMover(hActor, -1, 1, MOVER_SETFACE, hImage)
+</h5>
+<p>自アクターのグラフィックを指定したグラフィックハンドルに切り替える。</p>
+<h4><a name="addMover"></a>軌道設定命令</h4>
+<h5 class="implemented">addMover
+(hActor,starttime,duration,action)<br>
+addMover (hActor,starttime,duration,action,value)<br>
+addMover (hActor,starttime,duration,action,value1,value2)</h5>
+<p>hActorで指定したキャラにムーバー(自動制御要素)を追加。
+自身をTargetにする場合はiSelf()。</p>
+<h4>actionの値とvalue値の関係について</h4>
+<p>common.luaに次のように定義してある。引数で&amp;
+amp;
+amp;
+times;になっているところは不要ということ。</p>
+<table align="center" border="1" width="90%">
+<tbody>
+<tr>
+<th width="20%">定数名</th>
+<th width="24%">機能</th>
+<th width="19%">引数1</th>
+<th width="19%">引数2</th>
+<th width="28%">説明</th>
+</tr>
+<tr>
+<td width="20%">MOVER_SETANGLE</td>
+<td width="24%">方角指定</td>
+<td width="19%">方角(度)</td>
+<td width="19%">&times;</td>
+<td>指定角度に向く</td>
+</tr>
+<tr>
+<td width="20%">MOVER_SETSPEED</td>
+<td width="24%">速度指定</td>
+<td width="19%">速度(px/フレーム)</td>
+<td width="19%">&times;</td>
+<td>指定速度に変更</td>
+</tr>
+<tr>
+<td width="20%">MOVER_TURN</td>
+<td width="24%">旋回</td>
+<td width="19%">回転速度(度/フレーム)</td>
+<td width="19%">&times;</td>
+<td>指定角速度で回転運動</td>
+</tr>
+<tr>
+<td width="20%">MOVER_ACCEL</td>
+<td width="24%">加減速</td>
+<td width="19%">加速度(px/フレーム)</td>
+<td width="19%">&times;</td>
+<td>指定加速度で加減速</td>
+</tr>
+<tr>
+<td width="20%">MOVER_SETFACE</td>
+<td width="24%">キャラクタ切り替え</td>
+<td width="19%">キャラクタハンドル</td>
+<td width="19%">&times;</td>
+<td>キャラを指定キャラハンドルに切り替え</td>
+</tr>
+<tr>
+<td width="20%">MOVER_SETPOSITION</td>
+<td width="24%">座標指定</td>
+<td width="19%">X座標</td>
+<td width="19%">Y座標</td>
+<td>指定座標に移動</td>
+</tr>
+<tr>
+<td width="20%">MOVER_SETVECTOR</td>
+<td width="24%">ベクトル指定</td>
+<td width="19%">X方向速度(px/フレーム)</td>
+<td width="19%">Y方向速度(px/フレーム)</td>
+<td>指定ベクトルを与える</td>
+</tr>
+<tr>
+<td width="20%">MOVER_ADDVECTOR</td>
+<td width="24%">ベクトル加減算</td>
+<td width="19%">X方向加速度(px/フレーム)</td>
+<td width="19%">Y方向加速度(px/フレーム)</td>
+<td>現在の移動ベクトルに指定ベクトルを加算</td>
+</tr>
+<tr>
+<td width="20%">MOVER_SETZOOM</td>
+<td width="24%">拡大率設定</td>
+<td width="19%">横拡大率</td>
+<td width="19%">縦拡大率</td>
+<td>拡大率を指定値に変更</td>
+</tr>
+<tr>
+<td width="20%">MOVER_ADDZOOM</td>
+<td width="24%">拡大率加減算</td>
+<td width="19%">横拡大率加算値(倍/フレーム)</td>
+<td width="19%">横拡大率加算値(倍/フレーム)</td>
+<td>現在の拡大率に指定値を加算</td>
+</tr>
+<tr>
+<td width="20%">MOVER_SETBLEND</td>
+<td width="24%">描画時のブレンド法変更</td>
+<td width="19%">ブレンド方法(別表)</td>
+<td width="19%">&times;</td>
+<td>このキャラクタの描画時ブレンド方法を変更</td>
+</tr>
+<tr>
+<td>MOVER_SETANIMEPLAY</td>
+<td>キャラクタ自動アニメの設定</td>
+<td>0 = アニメ停止<br>
+非0 = アニメする</td>
+<td>&times;</td>
+<td>アクターの自動チップアニメ処理を行う</td>
+</tr>
+<tr>
+<td>MOVER_SETALPHA</td>
+<td>α値設定</td>
+<td>α値(0～255)</td>
+<td>&times;</td>
+<td>描画時のα値(不透明度)を指定値に変更</td>
+</tr>
+<tr>
+<td>MOVER_ADDALPHA</td>
+<td>α値加減算</td>
+<td>α値加算値(/フレーム)</td>
+<td>&times;</td>
+<td>現在のα値に指定値を加算</td>
+</tr>
+<tr>
+<td>MOVER_SETIMMORTALTIME</td>
+<td>無敵時間設定</td>
+<td>無敵時間(フレーム)</td>
+<td>&times;</td>
+<td>無敵時間を設定<br>
+(指定時間中は衝突判定命令で判定されない)</td>
+</tr>
+<tr>
+<td>MOVER_SETWAIT</td>
+<td>一時停止指示</td>
+<td>停止時間(フレーム)</td>
+<td>&times;</td>
+<td>指定したフレームの間、処理を停止する。</td>
+</tr>
+<tr>
+<td width="20%">MOVER_VANISH</td>
+<td width="24%">消滅指示</td>
+<td width="19%">&times;</td>
+<td width="19%">&times;</td>
+<td>このキャラクタを消去</td>
+</tr>
+<tr>
+<td>MOVER_SETHEADING</td>
+<td>画像回転角設定</td>
+<td>方角(度)</td>
+<td>&times;</td>
+<td>画像を指定角度に回転<br>
+(移動方向は変わらず)</td>
+</tr>
+<tr>
+<td>MOVER_TURNHEADING</td>
+<td>見た目だけ旋回</td>
+<td>回転速度(度/フレーム)</td>
+<td>&times;</td>
+<td>指定角速度で見た目だけ回転運動<br>
+(移動方向は変わらず)</td>
+</tr>
+<tr>
+<td>MOVER_SETHEADSYNC</td>
+<td>移動方向と見た目の向きの同期設定</td>
+<td>0 = 同期しない<br>
+非0 = 同期する</td>
+<td>&times;</td>
+<td>移動方向の設定と同時に見た目も回転させるかどうかを設定</td>
+</tr>
+<tr>
+<td>MOVER_SETCOLOR</td>
+<td>描画色の変更</td>
+<td colspan="2" rowspan="1">3引数、順番にR,G,B
+(0～255)</td>
+<td>描画色変更。255=元絵の色のまま、<br>
+0=その要素の色が真っ黒に。</td>
+</tr>
+</tbody>
+</table>
+<p>MOVER_CHANGEBLENDの定数は次の通り。</p>
+<pre>BLEND_NONE = 0 -- アルファブレンド無効<br>BLEND_NORMAL = 1 -- 通常ブレンディング<br>BLEND_ADD = 2 -- 加算ブレンディング<br>BLEND_MUL = 3 -- 乗算ブレンディング<br>BLEND_REVERSE = 4 -- 反転ブレンディング</pre>
+<h5 class="important">clearMover([hActorTarget])</h5>
+<p>指定したキャラ(省略時は自分自身)に登録されているムーバーを全
+削除。動作中であっても中断される。</p>
+<h4>キャラクタID獲得命令</h4>
+<h5 class="implemented">hActor
+= iSelf ()</h5>
+<p>自分のIDを得る。</p>
+<!--<h5 class="implemented">hActor = iMouse ()</h5> <p>マウスポインタのIDを得る。</p>-->
+<h5 class="implemented">hActor
+= iParent ()</h5>
+<p>直接の生成元キャラのIDを得る。</p>
+<h5 class="implemented">hActor
+= iMaster ()</h5>
+<p>一次生成元(ステージ制御部で生成されたアクター)のIDを得る。
+自分自身がステージ制御部で生成されているのなら自分自身のIDが帰る。</p>
+<h5 class="implemented">hActorTable
+= iLayerActors(layer)</h5>
+<p>指定したレイヤーに存在する全アクターのIDを取得。戻り値はテー
+ブル。</p>
+<h4>情報取得命令</h4>
+<h5 class="implemented">flag
+= isAlive (hActor)</h5>
+<p>指定したアクターが生存しているかを返す。消滅している場合は
+falseが返される。</p>
+<h5 class="implemented">frame
+= getUptime ([hActor])</h5>
+<p><strong>キャラクターの生成から経過した時間</strong>を
+返す。単位フレーム。省略すると自分自身を指定した場合に等価。(以下も同様)</p>
+<h5 class="implemented">x
+= getX ([hActor])</h5>
+<p>X座標を返す。</p>
+<h5 class="implemented">y
+= getY ([hActor])</h5>
+<p>Y座標を返す。</p>
+<h5 class="implemented">z
+=
+getZ ([hActor])</h5>
+<p>Z値を返す。</p>
+<h5 class="implemented">vx
+= getVX ([hActor])</h5>
+<p>X速度を返す。</p>
+<h5 class="implemented">vy
+= getVY ([hActor])</h5>
+<p>Y速度を返す。</p>
+<h5 class="implemented">angle
+= getAngle ([hActor])</h5>
+<p>向きを返す。</p>
+<h5 class="implemented">speed
+= getSpeed ([hActor])</h5>
+<p>速度を返す。</p>
+<h5 class="implemented">angle
+= getAngleFromVector ([hActor])</h5>
+<p>現在のベクトルの角度を返す。</p>
+<h5 class="implemented">speed
+= getSpeedFromVector ([hActor])</h5>
+<p>現在のベクトルの速度（大きさ）を返す。</p>
+<h5 class="important">hImage
+= getPattern([hActor])</h5>
+<p>現在割り当てられているグラフィックハンドルを返す。</p>
+<h5 class="implemented">deg
+= aim ([hActorfrom,]hActorto)</h5>
+<p>fromのアクターからtoのアクターに向く角度を返す。from
+が省略されると自分自身からの角度になる。</p>
+<h5 class="implemented">dist
+= dist ([hActorfrom,]hActorto)</h5>
+<p>fromのアクターからtoのアクターへの距離を返す。fromが
+省略されると自分自身からtoへの距離になる。</p>
+<h5 class="implemented">flag
+= isHitActor(hActor1[,hActor2])</h5>
+<p>ハンドルをひとつ指定した場合はそのアクターと自分自身、ふたつ指
+定した場合はその2つのアクターが接触しているかどうか(当たり判定矩形が重なっているか)を返す。なお、異なるレイヤー間のアクター同士の当たり判定を
+行う際、後述のレイヤースクロールを使用している場合はその分補正されて判定される( = 画面で見えている通りの位置関係で判定)。</p>
+<h5 class="implemented">hActor
+= getHitLayer([hActortarget,]layer)</h5>
+<p>hActortargetで指定されたアクター(省略した場合自分
+自身)と、指定レイヤーの全アクターとの当たり判定をチェック、最初に当たっていると判定されたアクターのハンドルを返す。どれにも当たっていなかった場
+合負数が返る。</p>
+<h4>動画表示・制御</h4>
+<h5 class="implemented">hMovie
+= loadMovie("filename")</h5>
+<p>動画ファイルを読み込む。戻り値は割り当てられたハンドル。
+hMovieはグラフィックハンドルとして定義される。</p>
+<h5 class="implemented">playMovie(hMovie)</h5>
+<p>指定されたハンドルの動画を再生する。</p>
+<h5 class="implemented">stopMovie(hMovie)</h5>
+<p>指定されたハンドルの動画を停止する。</p>
+<h5 class="implemented">flag
+= isMoviePlaying(hMovie)</h5>
+<p>動画が再生中ならture。</p>
+<h4>入力管理</h4>
+<h5 class="implemented">flag
+= isJoyPressed ([pad_no], button_no)</h5>
+<p>指定した番号のボタンが<strong class="important">押されているかどうか</strong>を
+返す。押されていれば1、押されてい
+なければ0。</p>
+<p>pad_noを省略した場合は0、2人同時プレイなどの場合は明示
+すること。</p>
+<p>button_noの定数は次のように定義されている。</p>
+<pre>BUTTON_RIGHT = 0 --方向右<br>BUTTON_DOWN = 1 --方向下<br>BUTTON_LEFT = 2 --方向左<br>BUTTON_UP = 3 --方向上<br>BUTTON_TRIG1 = 4 --トリガ１<br>BUTTON_TRIG2 = 5 --トリガ２<br>BUTTON_TRIG3 = 6 --トリガ３<br>...<br></pre>
+<h5 class="implemented">count
+= getJoyPressCount (button_no)</h5>
+<p>指定した番号のボタンが<strong class="important">押されはじめてからの経過時
+間</strong>を返す(単位フレーム)。押さ
+れていなければ0。</p>
+<h5 class="implemented">ID
+= getTrigID (PadID)</h5>
+<p>指定したパッドの入力情報を返す。入力状態の検索は以下の順で行わ
+れる。</p>
+<pre>入力確認 =&gt; 戻り値<br>BUTTON_UP =&gt; "up"<br>BUTTON_DOWN =&gt; "down"<br>BUTTON_LEFT =&gt; "left"<br>BUTTON_RIGHT =&gt; "right"<br>BUTTON_TRIG1 =&gt; "trig1"<br>BUTTON_TRIG2 =&gt; "trig2"<br>BUTTON_TRIG3 =&gt; "trig3"</pre>
+<p><strong>※common.luaで定義</strong></p>
+<h4></h4>
+<h4>その他の命令</h4>
+<h5 class="implemented">value
+= getv ([hActor,]slot)</h5>
+<p>指定アクターが個別に持っている値スロットから値を得る。
+hActorを省略すると自分自身を参照。</p>
+<h5 class="implemented">setv
+([hActor,]slot,value)</h5>
+<p>指定アクターが個別に持っている値スロットに値 value
+を書き込む。hActorを省略すると自分自身を参照。内部的には値はdoubleで保持されている。</p>
+<h5 class="implemented">attach
+("class")</h5>
+<p>classのサブスクリプトを割り当てる。サブスクリプトはメイン
+と並列に動作する。アクターの値スロットは共有するので値破壊に注意。</p>
+<h5 class="implemented">deattach
+()</h5>
+<p>いま割り当てられているサブスクリプトを終了。</p>
+<h5 class="implemented">release
+()</h5>
+<p>アクターに使った場合はスクリプトの駆動を終了。シーンスクリプト
+で使った場合はシーンの駆動を終了。</p>
+<h2>シーン制御</h2>
+<h3>構成</h3>
+<pre>function OnLoad()<br> -- スクリプト読み込み直後の処理 リソースの読み込みなど<br>end<br><br>function [SCENENAME]_OnStart()<br> -- シーン開始のときにあわせて呼ばれる処理 アクターの初期配置、変数の初期化など。<br>end<br> <br>function [SCENENAME]_OnStep()<br> -- 1フレに1回呼ばれる処理<br>end<br> <br>function [SCENENAME]_OnClose()<br> -- シーン終了の処理 表示したアクターを消すなど。<br>end<br><br>function OnVanish()<br> -- メモリ解放時の処理 読み込んだリソースの破棄など<br>end<br></pre>
+<h3>関数</h3>
+<h4>グローバルフラグ操作</h4>
+<h5 class="implemented">value
+= getgv (page,slot)</h5>
+<p>指定ページ、指定スロットのグローバルフラグ値を返す。ページは
+0～3、スロットは0～</p>
+<h5 class="implemented">setgv
+(page,slot,value)</h5>
+<p>指定ページ、指定スロットのグローバルフラグ値を設定する。<strong></strong></p>
+<!--<h5 class="important">setTag (slot,value)</h5> <p>シーンごとの固有情報「タグ」の値を設定。スロット0番にステージタイマーの初期値を与える以外は未定義。</p> <h5 class="implemented">setSTag (slot,&quot;string&quot;)</h5> <p>シーンごとの固有情報「タグ」の文字列を設定。0～2番に各レベルでの指示文をセットしておくこと。</p> <h5 class="implemented">endGame()</h5> <p>成功の可否に関わらず制限時間前にゲームを終了する。規定制限時間より早くゲームの判定が出る場合のテンポ切り詰めなどに利用する。</p> <p><strong>※common.luaで定義</strong></p>-->
+<h4>コルーチン制御</h4>
+<h5 class="implemented">startThread("threadname")</h5>
+<p>threadnameで指定した関数をスレッドとして起動。スレッ
+ドの中ではcoroutine.yield()で実行を一時停止。次のフレームではその次から実行を再開する。</p>
+<h5 class="implemented">flag
+= isThreadRunning()</h5>
+<p>スレッドが動作中ならtrue。</p>
+<h5 class="implemented">
+wait(count)<br>
+※この関数はスレッド内部でのみ使用可能。
+</h5>
+<p>count分スレッドを停止。</p>
+<p><strong>※common.luaで定義</strong></p>
+<h5 class="implemented">stopThread()</h5>
+<p>スレッドを強制停止。</p>
+<h4>グラフィック関連</h4>
+<h5 class="implemented">hImage
+= loadGraphic ("filename"[, r, g, b])</h5>
+<p>グラフィックを読み込む。hImageにグラフィックハンドルが帰
+る。<br>
+ファイル名の後ろのそれぞれの引数に「RGB値」を設定すると、指定された色が抜き色として取り扱われる。</p>
+<h5 class="implemented">deleteGraphic
+(hImage)</h5>
+<p>loadGraphic で読み込んだグラフィックを破棄。</p>
+<h5 class="implemented">deleteAllGraphic
+(hImages)</h5>
+<p>引数に渡されたテーブルのグラフィックを全て破棄。</p>
+<p><strong>※common.luaで定義</strong></p>
+<h5 class="implemented">hImage
+= cutGraphic (hSrcImage,x,y,width,height)</h5>
+<p>loadGraphicで読み込んだグラフィックの一部を新しいグ
+ラフィックとする。hImageに切り抜き済みのグラフィックハンドルが返る。</p>
+<h5 class="important">setGraphicClip
+(hImage,x,y,width,height)</h5>
+<p>hImageで指定したグラフィックの切り出し範囲を変更。元テク
+スチャの座標で指定。<strong>切り出し範囲を変更しても、描画基準点は調整されない。</strong></p>
+<h5 class="implemented">hImage
+= cloneGraphic (hsrcimage)</h5>
+<p>hsrcimageで指定したグラフィックと同じテクスチャ、同じ
+切り抜き矩形を持つグラフィックをもうひとつ生成。</p>
+<h5 class="implemented">setGraphicCenter(hImage,x,y)</h5>
+<p>hImageで指定したグラフィックの「描画時の基準座標」を指
+定。普通は画像の中心。回転、拡大の基準座標にもなる。</p>
+<h5 class="implemented">addGraphicHit(hImage,x,y,width,height)</h5>
+<p>hImageで指定したグラフィックに当たり判定矩形を追加。<span style="font-weight: bold;">初期状態では当たり判定が設定されていないので注意。</span>当たり判定矩形は1グラフィックあたり最大16個まで追加できる。</p>
+<h5 class="implemented">setGraphicAnime
+(hImage,hNextImage,delay)</h5>
+<p>hImageで指定したグラフィックにアニメ情報をセット。各グラ
+フィックは「次のコマ」と「このグラフィックを表示し続ける時間」を保持しているが、この命令でそれらの情報をセットする。hnextimageが次のコ
+マのグラフィックハンドル、delayが待ち時間。hnextimageに負数を与えるとこのコマでアニメーションが止まる。(アニメの終端)</p>
+<h5 class="implemented">hfirstimage
+= setGraphicAnimeSequence (hImages,delay)</h5>
+<p>hImagesにはテーブルを指定。テーブル内で指定したグラ
+フィックをすべて連結し、最後のコマで止まるアニメパターンを生成する。hImages[1]をアクターに割り当ててアニメを開始させると勝手にアニメし
+てくれる、という寸法。hImagesには直接テーブルを与えるとよい。</p>
+<p><strong>※common.luaで定義</strong></p>
+<h5 class="implemented">hfirstimage
+= setGraphicAnimeLoop (hImages,delay,looppoint)</h5>
+<p>hImagesにはテーブルを指定。テーブル内で指定したグラ
+フィックをすべて連結し、最後のコマまで到達するとlooppoint(インデックス番号)に戻るアニメパターンを生成する。</p>
+<p><strong>※common.luaで定義</strong></p>
+<h5 class="implemented">hImage
+= createBlankGraphic(width, height)</h5>
+<p>指定された空のグラフィックイメージを生成する。</p>
+<h5 class="implemented">hImage
+= createRenderTarget(width, height)</h5>
+<p>createBlankGraphic関数と同じく空のテクスチャ
+を作成するだけの関数だが、この関数で作成したテクスチャにはrenderSceneGroupToGraphic関数によって、シーンの内容を描画する
+ことができる。それ以外は通常のグラフィック同様に取り扱うことができる。</p>
+<h5 class="implemented">renderSceneGroupToGraphic(hImage,
+scenegroup)</h5>
+<p>指定された空のグラフィックイメージを生成する。
+scenegroupは0～2を指定。hImageがcreateRenderTargetで生成されていない場合はエラー。</p>
+<h4><strong>画面設定命令</strong></h4>
+<h5 class="implemented">cls([layer])</h5>
+<p>layerのオブジェクトを全て消去する。layerが未指定の場
+合は全アクターを消去する。</p>
+<h5 class="implemented">clearLayerSettings()</h5><p>各レイヤーの設定を全て初期化。オフセット、画面外自動消去、高速描画の設定が初期状態に戻る。</p><!--<h5 class="implemented">setBGColor (R,G,B)</h5> <p>背景色を設定。</p>-->
+<h5 class="implemented">setScreenSize(width,height)</h5>
+<p>仮想画面のサイズを設定。実画面が640x480のとき、
+640,480に設定すると実際の画面の
+まま。320,240にすると画面全体が二倍拡大された感じになる。</p>
+<!--<h5 class="implemented">setGraphicForZLayer (hImage)</h5> <p><strong>この命令は旧バージョンとの互換のために残してある。後述のレイヤー設定変更命令を使用した場合は必ずsetLayerGraphicForFastDrawを使うこと。</strong></p> <p>描画順自動ソートありレイヤー(レイヤー2,3)で使用するテクスチャを使用しているグラフィックハンドルを設定。ここで指定したテクスチャを使っているグラフィックのみがレイヤー2,3で描画可能になる。それ以外のグラフィックを描画しようとすると化けるので注意。</p>-->
+<h5 class="important">setLayerScroll
+(layer,x,y)</h5>
+<p>指定レイヤーの描画オフセット座標を設定。画面上では(x,y)の
+分だけ左上にズレて描画されて見える。x,yは実数。(負数可)</p>
+<h5 class="important">X =
+getLayerScrollX (layer)</h5>
+<p>指定レイヤーの描画オフセットX座標を得る。</p>
+<h5 class="important">Y =
+getLayerScrollY (layer)</h5>
+<p>指定レイヤーの描画オフセットY座標を得る。</p>
+<h5 class="implemented">setLayerAutoVanish(layer,flag)</h5>
+<p>指定レイヤーにおける「画面外自動消去」の有効・無効を設定。</p>
+<h5 class="implemented">setLayerUseFastDraw(layer,flag)</h5>
+<p>指定レイヤーにて高速描画モードを有効にする。高速描画モードを有
+効にすると以下の制限が加わる代わりに描画速度が大幅に向上し、描画順を自由に設定できる。</p>
+<ul>
+<li>1つのレイヤーで使えるテクスチャは1枚。レイヤーで使
+われるすべてのグラフィックが1枚のテクスチャから切り出されていなければならない。指定できる。</li>
+<li>描画時の特殊効果(加算、乗算、反転)は使えない。半透明描画のみが使える。(アルファ値の指定も可)</li>
+</ul>
+<h5 class="implemented">setLayerUseAutoYSort(layer,flag)</h5>
+<p>指定レイヤーの自動描画順ソートを有効にする。これを有効にすると
+Y座標がより大きいアクターが自動的に手前に描画されるようになる。ただし高速描画モードが有効でないと何も変化しない。</p>
+<h5 class="implemented">setLayerGraphicForFastDraw(layer.hImage)</h5>
+<p>指定した高速描画レイヤーで使用するテクスチャを含むグラフィック
+のハンドルを設定。ここで指定したテクスチャを使っているグラフィックのみがこのレイヤーで描画可能になる。それ以外のグラフィックを描画しようとすると
+化けるので注意。</p>
+<h5 class="implemented">setLayerDrawHitBox(layer,flag[,R,G,B])</h5>
+<p class="important"><strong>デ
+バッグ専用(一般公開Verではこの命令は無視されます(エラーにはなりません))</strong></p>
+<p>指定したレイヤーのアクターの当たり判定矩形を描画する。RGBを
+指定すると矩形の色を設定可能(0～255)。省略すると白色。</p>
+<!-- <h5 class="implemented">setLayerSetting(params)</a></h5><p>setLayerAutoVanish,
+setLayerUseFastDraw, setLayerUseAutoYSort, setLayerGraphicForFastDraw
+を全レイヤー一括指定する。paramsで指定するテーブルに32個のパラメータを設定して渡すこと。</a></p>
+<p>1レイヤー分のパラメータはflag3つとグラフィックハンドル1
+つから構成され、8レイヤー分のパラメータを列挙する。第2パラメータがfalseの場合、第3、第4パラメータの値はnilでよい(省略は不可)。</a></p>
+<p><strong>※common.luaで定義</strong></p>
+<pre>G.obj = loadGraphic("hogehoge.png")<br>(中略)<br>layerparam = {<br>	false, true, true, G.obj, -- layer0<br>	false, false, nil, nil, -- layer1<br>	false, false, nil, nil, -- layer2<br>	true, true, false, G.obj, -- layer3<br>	false, true, false, G.obj, -- layer4<br>	false, false, nil, nil, -- layer5<br>	false, true, true, G.obj, -- layer6<br>	false, false, nil, nil, -- layer7<br>}
+<br>setLayerSetting(layerparam)<br></pre>-->
+<h3>サウンド制御</h3>
+<h5 class="implemented">
+handle = loadSound ("filename")</h5>
+<p>WAVEファイルを読み込む。戻り値は割り当てられたサウンドハン
+ドル。</p>
+<h5 class="implemented">playSound
+(handle)</h5>
+<p>handleはサウンドハンドル(loadSoundの戻り値)。</p>
+<!--<h5 class="implemented">playSoundF (handle)</h5> <p>現在のゲームスピードにあわせてサウンドを早回し再生。</p>-->
+<h5 class="implemented">stopSound
+(handle)</h5>
+<p>指定した音を強制的に止める。</p>
+<h5 class="implemented">stopSounds
+(table)</h5>
+<p>table に存在する音を強制的に止める。</p>
+<h5 class="implemented">deleteSound
+(handle)</h5>
+<p>サウンドをメモリから削除。</p>
+<h5 class="implemented">deleteSound
+(table)</h5>
+<p>table に存在するサウンドを全て削除。</p>
+<p><strong>※common.luaで定義</strong></p>
+<h5 class="implemented">playMusic
+("filename")</h5>
+<p>oggストリームを再生。</p>
+<h5 class="implemented">playMusicLoop
+(["introfilename",]"loopfilename")</h5>
+<p>oggストリームをループ再生。引数2個でイントロ→ループ再生
+に、1個で単独のループ再生になる。</p>
+<!--<h5 class="implemented">playMusicF (&quot;filename&quot;)</h5> <p>現在のゲームスピードにあわせてoggストリームを早回し再生。</p> <h5 class="implemented">playMusicLoopF ([&quot;introfilename&quot;,]&quot;loopfilename&quot;)</h5> <p>現在のゲームスピードにあわせてoggストリームを早回しループ再生。</p>-->
+<h5 class="implemented">stopMusic
+()</h5>
+<p>再生中のoggストリームを停止。</p>
+<h2>汎用関数</h2>
+<p>上記のどの分類にもあてはまらない汎用関数。</p><h5 class="implemented">integer
+= randMT( min,max )<br>
+integer = randMT( max )<br>
+double = randMT()</h5>
+<p>Mersenne Twisterによって生成された乱数を返す。</p>
+<ul>
+<li>引数二個でmin以上max以下の<strong>整
+数</strong>、</li>
+<li>引数一個で1以上max以下の<strong>整数</strong>、</li>
+<li>引数なしで0以上1以下の<strong>実数</strong></li>
+</ul>
+<p>を返す。math.randomはそのままこの関数に置き換え可
+能。</p>
+<h5 class="implemented">srandMT([seed])</h5>
+<p>randMTの「種」を指定。値は整数。省略すると現在時刻を元に
+自動決定。math.randomseedを置き換え可能。</p>
+<h5 class="implemented">crc
+= crc32(input)</h5>
+<p>inputに渡された文字列のCRC32を返す。</p>
+<h5 class="implemented">text
+= serialize(table)</h5>
+<p>table
+の内容をテキストにする。10月2日現在、非テーブルが渡された場合のエラー処理は行っていないので注意。</p>
+<p><strong>※common.luaで定義</strong></p>
+<h5 class="implemented">table
+= deserialize(text)</h5>
+<p>text
+の内容をテーブルにする。内部的にはLuaスクリプトを実行しているだけであり、実行中にエラー処理が発生した場合の処理は行っていないので注意。</p>
+<p><strong>※common.luaで定義</strong></p>
+</body></html>

@@ -1,0 +1,1 @@
+call ..\..\bin\AIMS_dev.exe -c AIMS
