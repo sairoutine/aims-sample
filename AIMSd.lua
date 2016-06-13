@@ -3,7 +3,7 @@
 --
 
 -- アプリケーション名 タイトルバーにはこれが出る
-APPLICATION_NAME = "AIMS Application";
+APPLICATION_NAME = "Sample Game";
 
 -- AIMS2007/7月版までの挙動にできるだけ合わせるオプション
 -- 普通は意識しなくて良いです
