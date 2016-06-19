@@ -123,10 +123,10 @@ function game_OnStep ()
 -- isJoyPressedというのはキーの入力状態を確認する関数です。
 -- 入力されていればtrue が、入力されていなければfalse となります。
 	if(isJoyPressed(BUTTON_LEFT) == true)then
-		x = x + YUYUKO_SPEED;
+		x = x - YUYUKO_SPEED;
 	end
 	if(isJoyPressed(BUTTON_RIGHT) == true)then
-		x = x - YUYUKO_SPEED;
+		x = x + YUYUKO_SPEED;
 	end
 	if(isJoyPressed(BUTTON_UP) == true)then
 		y = y - YUYUKO_SPEED;
