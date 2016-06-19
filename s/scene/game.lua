@@ -21,7 +21,7 @@ yuyuko.lua
 YUYUKO_SPEED = 2;	-- ゆゆ様の移動スピード
 
 
-function yuyuko_OnStart ()
+function game_OnStart ()
 	
 --[[
 グラフィックデータの読み込み
@@ -98,7 +98,7 @@ function yuyuko_OnStart ()
 ]]
 end
 
-function yuyuko_OnStep ()
+function game_OnStep ()
 --[[
 	この「OnStep」は1フレームに1回処理されます。
 	
@@ -143,7 +143,7 @@ function yuyuko_OnStep ()
 	
 end
 
-function yuyuko_OnClose ()
+function game_OnClose ()
 	-- 読み込んだ画像はちゃんと破棄しましょう
 	deleteAllGraphic(G.yuyuko);
 	
