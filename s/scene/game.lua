@@ -80,28 +80,38 @@ function game_OnStep ()
 -- 2.入力状態に応じてキャラクターの位置をずらします。
 -- isJoyPressedというのはキーの入力状態を確認する関数です。
 -- 入力されていればtrue が、入力されていなければfalse となります。
-	if(getJoyPressCount(BUTTON_LEFT) > 0)then
+	if(isJoyPressed(BUTTON_LEFT) == true)then
 		x = x - YUYUKO_SPEED;
-		addMover(A.yuyuko, -1, 1, MOVER_SETFACE, G.yuyuko.walk_left[1]);
 	end
 	if(isJoyPressed(BUTTON_RIGHT) == true)then
 		x = x + YUYUKO_SPEED;
-		addMover(A.yuyuko, -1, 1, MOVER_SETFACE, G.yuyuko.walk_right[1]);
 	end
 	if(isJoyPressed(BUTTON_UP) == true)then
 		y = y - YUYUKO_SPEED;
-		addMover(A.yuyuko, -1, 1, MOVER_SETFACE, G.yuyuko.walk_up[1]);
 	end
 	if(isJoyPressed(BUTTON_DOWN) == true)then
 		y = y + YUYUKO_SPEED;
-		addMover(A.yuyuko, -1, 1, MOVER_SETFACE, G.yuyuko.walk_down[1]);
 	end
 	
 -- 3.ゆゆ様の位置を動かします。
 -- addMoverというのは、アクターに特定の命令をさせるための命令です。
 
 	addMover(A.yuyuko, -1, 1, MOVER_SETPOSITION, x, y);
-	
+
+-- 4.方向に向けてアニメーションを変えます
+	if(getJoyPressCount(BUTTON_LEFT) == 1)then
+		addMover(A.yuyuko, -1, 1, MOVER_SETFACE, G.yuyuko.walk_left[1]);
+	end
+	if(getJoyPressCount(BUTTON_RIGHT) == 1)then
+		addMover(A.yuyuko, -1, 1, MOVER_SETFACE, G.yuyuko.walk_right[1]);
+	end
+	if(getJoyPressCount(BUTTON_UP) == 1)then
+		addMover(A.yuyuko, -1, 1, MOVER_SETFACE, G.yuyuko.walk_up[1]);
+	end
+	if(getJoyPressCount(BUTTON_DOWN) == 1)then
+		addMover(A.yuyuko, -1, 1, MOVER_SETFACE, G.yuyuko.walk_down[1]);
+	end
+
 	
 end
 
