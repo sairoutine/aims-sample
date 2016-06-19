@@ -36,10 +36,10 @@ function game_OnStart ()
 	G.yuyuko.walk_left[4] = cutGraphic(G.yuyuko.base, 240, 92, 24, 32);
 
 -- アニメーションの設定をする
-	setGraphicAnimeLoop(G.yuyuko.walk_down, 15, 1);
-	setGraphicAnimeLoop(G.yuyuko.walk_up, 15, 1);
+	setGraphicAnimeLoop(G.yuyuko.walk_down,  15, 1);
+	setGraphicAnimeLoop(G.yuyuko.walk_up,    15, 1);
 	setGraphicAnimeLoop(G.yuyuko.walk_right, 15, 1);
-	setGraphicAnimeLoop(G.yuyuko.walk_left, 15, 1);
+	setGraphicAnimeLoop(G.yuyuko.walk_left,  15, 1);
 
 
 
@@ -47,7 +47,7 @@ function game_OnStart ()
 -- この画面上に表示されるもの「全て」をアクターと呼びます。
 -- 背景とて例外ではありません。(今回は出していませんけどね)
 
-	A.yuyuko = createActor(G.yuyuko.walk_down[1], 320, 240, 4);
+	A.yuyuko = createActor(G.yuyuko.walk_down[1], 24, 32, 4);
 	
 --[[
 	createActorの戻り値はそのアクターを示すハンドル(一意な値)
@@ -82,6 +82,7 @@ function game_OnStep ()
 -- 入力されていればtrue が、入力されていなければfalse となります。
 	if(isJoyPressed(BUTTON_LEFT) == true)then
 		x = x - YUYUKO_SPEED;
+		-- addMover(A,yuyuko, -1, 1, MOVER_SETFACE, G.yuyuko.walk_left[1]);
 	end
 	if(isJoyPressed(BUTTON_RIGHT) == true)then
 		x = x + YUYUKO_SPEED;
