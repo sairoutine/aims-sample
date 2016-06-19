@@ -80,7 +80,7 @@ function game_OnStep ()
 -- 2.入力状態に応じてキャラクターの位置をずらします。
 -- isJoyPressedというのはキーの入力状態を確認する関数です。
 -- 入力されていればtrue が、入力されていなければfalse となります。
-	if(isJoyPressed(BUTTON_LEFT) == true)then
+	if(getJoyPressCount(BUTTON_LEFT) > 0)then
 		x = x - YUYUKO_SPEED;
 		addMover(A.yuyuko, -1, 1, MOVER_SETFACE, G.yuyuko.walk_left[1]);
 	end
