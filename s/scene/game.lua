@@ -30,10 +30,10 @@ function game_OnStart ()
 	G.yuyuko.walk_right[4] = cutGraphic(G.yuyuko.base, 240, 32, 24, 32);
 
 	G.yuyuko.walk_left = {};
-	G.yuyuko.walk_left[1] = cutGraphic(G.yuyuko.base, 216, 92, 24, 32);
-	G.yuyuko.walk_left[2] = cutGraphic(G.yuyuko.base, 240, 92, 24, 32);
-	G.yuyuko.walk_left[3] = cutGraphic(G.yuyuko.base, 264, 92, 24, 32);
-	G.yuyuko.walk_left[4] = cutGraphic(G.yuyuko.base, 240, 92, 24, 32);
+	G.yuyuko.walk_left[1] = cutGraphic(G.yuyuko.base, 216, 96, 24, 32);
+	G.yuyuko.walk_left[2] = cutGraphic(G.yuyuko.base, 240, 96, 24, 32);
+	G.yuyuko.walk_left[3] = cutGraphic(G.yuyuko.base, 264, 96, 24, 32);
+	G.yuyuko.walk_left[4] = cutGraphic(G.yuyuko.base, 240, 96, 24, 32);
 
 -- アニメーションの設定をする
 	setGraphicAnimeLoop(G.yuyuko.walk_down,  15, 1);
@@ -48,7 +48,7 @@ function game_OnStart ()
 -- 背景とて例外ではありません。(今回は出していませんけどね)
 
 	A.yuyuko = createActor(G.yuyuko.walk_down[1], 24, 32, 4);
-	
+
 --[[
 	createActorの戻り値はそのアクターを示すハンドル(一意な値)
 	です。アクターへの操作にはほとんどの場合ハンドルが必要になるので
@@ -86,12 +86,15 @@ function game_OnStep ()
 	end
 	if(isJoyPressed(BUTTON_RIGHT) == true)then
 		x = x + YUYUKO_SPEED;
+		addMover(A.yuyuko, -1, 1, MOVER_SETFACE, G.yuyuko.walk_right[1]);
 	end
 	if(isJoyPressed(BUTTON_UP) == true)then
 		y = y - YUYUKO_SPEED;
+		addMover(A.yuyuko, -1, 1, MOVER_SETFACE, G.yuyuko.walk_up[1]);
 	end
 	if(isJoyPressed(BUTTON_DOWN) == true)then
 		y = y + YUYUKO_SPEED;
+		addMover(A.yuyuko, -1, 1, MOVER_SETFACE, G.yuyuko.walk_down[1]);
 	end
 	
 -- 3.ゆゆ様の位置を動かします。
