@@ -36,6 +36,7 @@ prequire("s/blank.lua");
 -- ゲームシーン呼び出し
 -------------------------------------------
 --ゲームのシーンスクリプトをprequireします。
+prequire("s/scene/game.lua");
 
 -------------------------------------------
 -- OnLoad　起動直後に呼ばれる
@@ -50,7 +51,7 @@ end
 
 -- 起動直後はbootシーンが呼ばれます。
 function boot_OnStart()
-	cls(); 
+	cls();
 	clearLayerSettings();
 end
 
@@ -58,6 +59,7 @@ end
 -- OnStep
 -------------------------------------------
 function boot_OnStep()
+	changeScene("game");
 end
 -------------------------------------------
 -- OnClose
