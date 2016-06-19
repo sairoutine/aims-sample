@@ -99,7 +99,6 @@ function game_OnStart ()
 end
 
 function game_OnStep ()
-	dm('test')
 --[[
 	この「OnStep」は1フレームに1回処理されます。
 	
@@ -124,6 +123,7 @@ function game_OnStep ()
 -- isJoyPressedというのはキーの入力状態を確認する関数です。
 -- 入力されていればtrue が、入力されていなければfalse となります。
 	if(isJoyPressed(BUTTON_LEFT) == true)then
+		dm('left')
 		x = x + YUYUKO_SPEED;
 	end
 	if(isJoyPressed(BUTTON_RIGHT) == true)then
