@@ -99,6 +99,7 @@ function game_OnStart ()
 end
 
 function game_OnStep ()
+	dm('test')
 --[[
 	この「OnStep」は1フレームに1回処理されます。
 	
