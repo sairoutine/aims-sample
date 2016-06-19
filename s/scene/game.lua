@@ -54,7 +54,7 @@ function game_OnStart ()
 
 	-- îwåiÅAâπäyê›íË
 	-- A.bg = createActor(G.bg,320,240,LAYER_BG0);
-	-- playMusicLoop("bgm/fushinokemuri.ogg");
+	playMusicLoop("bgm/fushinokemuri.ogg");
 end
 
 function game_OnStep ()
