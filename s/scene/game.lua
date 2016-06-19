@@ -3,6 +3,10 @@ LAYER_BG0		= 0;
 
 
 function game_OnStart ()
+	-- 画面、レイヤー設定
+	cls();
+	clearLayerSettings();
+
 	G.yuyuko = {};
 
 	G.yuyuko.base = loadGraphic("gfx/kenemoco.png");
@@ -44,10 +48,6 @@ function game_OnStart ()
 
 	-- 妹紅表示
 	A.yuyuko = createActor(G.yuyuko.walk_down[1], 24, 32, 4, 'mokou');
-
-	-- 画面、レイヤー設定
-	cls();
-	clearLayerSettings();
 
 
 	G.bg = loadGraphic("gfx/seed.jpg");
