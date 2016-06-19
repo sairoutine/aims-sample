@@ -23,10 +23,25 @@ function game_OnStart ()
 	G.yuyuko.walk_up[3] = cutGraphic(G.yuyuko.base, 264, 0, 24, 32);
 	G.yuyuko.walk_up[4] = cutGraphic(G.yuyuko.base, 240, 0, 24, 32);
 
+	G.yuyuko.walk_right = {};
+	G.yuyuko.walk_right[1] = cutGraphic(G.yuyuko.base, 216, 32, 24, 32);
+	G.yuyuko.walk_right[2] = cutGraphic(G.yuyuko.base, 240, 32, 24, 32);
+	G.yuyuko.walk_right[3] = cutGraphic(G.yuyuko.base, 264, 32, 24, 32);
+	G.yuyuko.walk_right[4] = cutGraphic(G.yuyuko.base, 240, 32, 24, 32);
 
+	G.yuyuko.walk_left = {};
+	G.yuyuko.walk_left[1] = cutGraphic(G.yuyuko.base, 216, 92, 24, 32);
+	G.yuyuko.walk_left[2] = cutGraphic(G.yuyuko.base, 240, 92, 24, 32);
+	G.yuyuko.walk_left[3] = cutGraphic(G.yuyuko.base, 264, 92, 24, 32);
+	G.yuyuko.walk_left[4] = cutGraphic(G.yuyuko.base, 240, 92, 24, 32);
 
 -- アニメーションの設定をする
 	setGraphicAnimeLoop(G.yuyuko.walk_down, 15, 1);
+	setGraphicAnimeLoop(G.yuyuko.walk_up, 15, 1);
+	setGraphicAnimeLoop(G.yuyuko.walk_right, 15, 1);
+	setGraphicAnimeLoop(G.yuyuko.walk_left, 15, 1);
+
+
 
 -- ゆゆ様を画面上に表示する
 -- この画面上に表示されるもの「全て」をアクターと呼びます。
