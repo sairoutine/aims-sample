@@ -1,7 +1,92 @@
 --
 -- AIMS アプリケーションコンフィグスクリプト
--- ※実際に制作者が弄る部分はこのスクリプトの最後にまとめてあります!
 --
+
+-- アプリケーション名 タイトルバーにはこれが出る
+APPLICATION_NAME = "Sample Game";
+
+-- AIMS2007/7月版までの挙動にできるだけ合わせるオプション
+-- 普通は意識しなくて良いです
+COMPATIBILITY_MODE = 0;
+
+-- ESCキーをアプリケーションで使うか
+-- 0だとESCキーはAIMSが終了キーに使います。1だとAIMSは何もしません。
+USE_ESC_IN_APPLICATION = 0;
+
+-- F1キーの有効・無効
+-- createRenderTargetを使ってるアプリだと、
+-- 実行中のウィンドウモード切替はトラブルの元になります。
+-- 省略するとF1は有効になります。
+USE_F1 = 1;
+
+-- セーブファイルのパス
+-- パス区切りは円記号２個で指定してください。環境変数が使えます。
+-- 空文字列or省略でexeファイルと同じところになります。
+-- 指定する場合は、必ず最後に円記号２個をつけること。
+-- 例：SAVE_PATH = "%APPDATA%\\D.N.A. Softwares\\AIMS\\";
+SAVE_PATH = "";
+
+-- 物理解像度の設定
+RESOLUTION_X = 640;
+RESOLUTION_Y = 480;
+
+-- 標準の論理解像度の設定 普通は物理解像度と同じでいい
+
+VRESOLUTION_X = 640;
+VRESOLUTION_Y = 480;
+
+-- VSYNCの設定。普通は1でいいんですが、
+-- 早送り機能(setFastForward(true))を使いたい場合はこれを0にしないと
+-- いけません（タイマー待ちを省略してもVSYNCで止まってしまう）
+USE_VSYNC=1;
+
+-- 標準のキーバインド ジョイスティックはゲーム中に動的再定義が可能です。
+-- ボタン番号は0からはじまります
+-- 使わないトリガ、プレイヤーについては設定せず放置しておいても結構です。
+-- キーコードについては最後にまとめてありますので参照ください。
+
+-- マウスポインタをAIMSに占有させる
+CLIP_MOUSE_POINTER = 0;
+
+-- (v1.40より) MODPlugによるMOD再生命令を使うかどうか
+-- これを1にするとMPPSDK.dllの同梱が必須になります。
+-- (MPPSDK.dllが同じフォルダにないとエラーで止まる)
+-- MOD再生を使わない限り0のままでけっこうです。
+-- なお、MPPSDK.dllはbin/に置いてあります。
+USE_MODPLUG = 0
+
+
+-- プレイヤー人数　有効デバイス数に直結します。
+MAXIMUM_PLAYERS = 2;
+MAXIMUM_TRIGGERS = 2;
+USE_MOUSE = 0;
+
+-- 1p ゲームパッド
+BIND_PAD_1P_TRIG1 = 0;
+BIND_PAD_1P_TRIG2 = 1;
+
+-- 1p キーボード
+BIND_KEY_1P_DIR_U = DIK_R;
+BIND_KEY_1P_DIR_D = DIK_F;
+BIND_KEY_1P_DIR_L = DIK_D;
+BIND_KEY_1P_DIR_R = DIK_G;
+BIND_KEY_1P_TRIG1 = DIK_A;
+BIND_KEY_1P_TRIG2 = DIK_S;
+
+-- 2p ゲームパッド
+BIND_PAD_2P_TRIG1 = 0;
+BIND_PAD_2P_TRIG2 = 1;
+
+-- 2p キーボード
+BIND_KEY_2P_DIR_U = DIK_UP;
+BIND_KEY_2P_DIR_D = DIK_DOWN;
+BIND_KEY_2P_DIR_L = DIK_LEFT;
+BIND_KEY_2P_DIR_R = DIK_RIGHT;
+BIND_KEY_2P_TRIG1 = DIK_NUMPAD0;
+BIND_KEY_2P_TRIG2 = DIK_NUMPADPERIOD;
+
+
+--[[
 
 --
 -- DirectInputのキーコード定数 BIND_KEYBOARD～～に与える値
@@ -172,64 +257,4 @@ DIK_RIGHTARROW	= DIK_RIGHT;
 DIK_DOWNARROW	= DIK_DOWN;
 DIK_PGDN		= DIK_NEXT;
 
---
--- アプリケーション定義ここから
---
-
--- アプリケーション名 タイトルバーにはこれが出る
-APPLICATION_NAME = "AIMS Application";
-
--- AIMS2007/7月版までの挙動にできるだけ合わせるオプション
--- 普通は意識しなくて良いです
-COMPATIBILITY_MODE = 0;
-
--- ESCキーをアプリケーションで使うか
--- 0だとESCキーはAIMSが終了キーに使います。1だとAIMSは何もしません。
-USE_ESC_IN_APPLICATION = 0;
-
--- F1キーの有効・無効
--- createRenderTargetを使ってるアプリだと、
--- 実行中のウィンドウモード切替はトラブルの元になります。
--- 省略するとF1は有効になります。
-USE_F1 = 1;
-
--- セーブファイルのパス
--- パス区切りは円記号２個で指定してください。環境変数が使えます。
--- 空文字列or省略でexeファイルと同じところになります。
--- 指定する場合は、必ず最後に円記号２個をつけること。
--- 例：SAVE_PATH = "%APPDATA%\\D.N.A. Softwares\\AIMS\\";
-SAVE_PATH = "";
-
--- 物理解像度の設定
-RESOLUTION_X = 640;
-RESOLUTION_Y = 480;
-
--- 標準の論理解像度の設定 普通は物理解像度と同じでいい
-
-VRESOLUTION_X = 640;
-VRESOLUTION_Y = 480;
-
--- 標準のキーバインド ジョイスティックはゲーム中に動的再定義が可能です。
--- ボタン番号は0からはじまります
--- 使わないトリガ、プレイヤーについては設定せず放置しておいても結構です。
-
--- マウスポインタをAIMSに占有させる
-CLIP_MOUSE_POINTER = 0;
-
--- プレイヤー人数　有効デバイス数に直結します。
-MAXIMUM_PLAYERS = 1;
-MAXIMUM_TRIGGERS = 2;
-USE_MOUSE = 0;
-
--- 1p ゲームパッド
-BIND_PAD_1P_TRIG1 = 0;
-BIND_PAD_1P_TRIG2 = 1;
-
--- 1p キーボード
-BIND_KEY_1P_DIR_U = DIK_UP;
-BIND_KEY_1P_DIR_D = DIK_DOWN;
-BIND_KEY_1P_DIR_L = DIK_LEFT;
-BIND_KEY_1P_DIR_R = DIK_RIGHT;
-BIND_KEY_1P_TRIG1 = DIK_Z;
-BIND_KEY_1P_TRIG2 = DIK_X;
-
+]]
