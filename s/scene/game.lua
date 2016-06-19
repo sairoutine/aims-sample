@@ -53,7 +53,7 @@ function game_OnStart ()
 	G.bg = loadGraphic("gfx/seed.jpg");
 
 	-- îwåiÅAâπäyê›íË
-	-- A.bg = createActor(G.bg,320,240,LAYER_BG0);
+	A.bg = createActor(G.bg,320,240,LAYER_BG0);
 	playMusicLoop("bgm/fushinokemuri.ogg");
 end
 
