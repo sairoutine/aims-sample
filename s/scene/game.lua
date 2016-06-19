@@ -18,18 +18,8 @@ function game_OnStart ()
 	G.yuyuko.walk_down[4] = cutGraphic(G.yuyuko.base, 240, 64, 24, 32);
 
 -- アニメーションの設定をする
-	setGraphicAnime(G.yuyuko.walk_down[1], G.yuyuko.walk_down[2], 15);
-	setGraphicAnime(G.yuyuko.walk_down[2], G.yuyuko.walk_down[3], 15);
-	setGraphicAnime(G.yuyuko.walk_down[3], G.yuyuko.walk_down[4], 15);
-	setGraphicAnime(G.yuyuko.walk_down[4], G.yuyuko.walk_down[1], 15);
+	setGraphicAnimeLoop(G.yuyuko.walk_down, 15, 1);
 
---[[
-	なお、このようなループアニメーションは以下の命令で同様に定義できる。
-		setGraphicAnimeLoop(G.yuyuko.walk_down, 15, 1);
-	
-	ただしこの場合、アニメーションスピードは全て同一になるので注意。
-]]
-	
 -- ゆゆ様を画面上に表示する
 -- この画面上に表示されるもの「全て」をアクターと呼びます。
 -- 背景とて例外ではありません。(今回は出していませんけどね)
