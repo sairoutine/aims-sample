@@ -1,3 +1,7 @@
+-- レイヤー
+LAYER_BG0		= 0;
+
+
 function game_OnStart ()
 	G.yuyuko = {};
 
@@ -38,7 +42,19 @@ function game_OnStart ()
 	setGraphicAnimeLoop(G.yuyuko.walk_right, 15, 1);
 	setGraphicAnimeLoop(G.yuyuko.walk_left,  15, 1);
 
+	-- 妹紅表示
 	A.yuyuko = createActor(G.yuyuko.walk_down[1], 24, 32, 4, 'mokou');
+
+	-- 画面、レイヤー設定
+	cls();
+	clearLayerSettings();
+
+
+	G.bg = loadGraphic("gfx/seed.jpg");
+
+	-- 背景、音楽設定
+	-- A.bg = createActor(G.bg,320,240,LAYER_BG0);
+	-- playMusicLoop("bgm/fushinokemuri.ogg");
 end
 
 function game_OnStep ()
