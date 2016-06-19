@@ -82,7 +82,7 @@ function game_OnStep ()
 -- “ü—Í‚³‚ê‚Ä‚¢‚ê‚Îtrue ‚ªA“ü—Í‚³‚ê‚Ä‚¢‚È‚¯‚ê‚Îfalse ‚Æ‚È‚è‚Ü‚·B
 	if(isJoyPressed(BUTTON_LEFT) == true)then
 		x = x - YUYUKO_SPEED;
-		-- addMover(A,yuyuko, -1, 1, MOVER_SETFACE, G.yuyuko.walk_left[1]);
+		addMover(A.yuyuko, -1, 1, MOVER_SETFACE, G.yuyuko.walk_left[1]);
 	end
 	if(isJoyPressed(BUTTON_RIGHT) == true)then
 		x = x + YUYUKO_SPEED;
