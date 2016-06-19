@@ -47,7 +47,7 @@ function game_OnStart ()
 -- この画面上に表示されるもの「全て」をアクターと呼びます。
 -- 背景とて例外ではありません。(今回は出していませんけどね)
 
-	A.yuyuko = createActor(G.yuyuko.walk_down[1], 24, 32, 4);
+	A.yuyuko = createActor(G.yuyuko.walk_down[1], 24, 32, 4, 'mokou');
 
 --[[
 	createActorの戻り値はそのアクターを示すハンドル(一意な値)
