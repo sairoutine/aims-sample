@@ -6,15 +6,22 @@ function game_OnStart ()
 -- 画像をロードする。
 	G.yuyuko.base = loadGraphic("gfx/kenemoco.png");
 -- 画像からグラフィックを切り出す
+
+-- 初期位置64, 216
+-- 横288 / 12 = 24
+-- 縦128 / 4 = 32
+
 	G.yuyuko.anime = {};
 	G.yuyuko.anime[1] = cutGraphic(G.yuyuko.base, 216, 64, 24, 32);
 	G.yuyuko.anime[2] = cutGraphic(G.yuyuko.base, 240, 64, 24, 32);
 	G.yuyuko.anime[3] = cutGraphic(G.yuyuko.base, 264, 64, 24, 32);
+	G.yuyuko.anime[4] = cutGraphic(G.yuyuko.base, 240, 64, 24, 32);
 
 -- アニメーションの設定をする
 	setGraphicAnime(G.yuyuko.anime[1], G.yuyuko.anime[2], 15);
 	setGraphicAnime(G.yuyuko.anime[2], G.yuyuko.anime[3], 15);
-	setGraphicAnime(G.yuyuko.anime[3], G.yuyuko.anime[1], 15);
+	setGraphicAnime(G.yuyuko.anime[3], G.yuyuko.anime[4], 15);
+	setGraphicAnime(G.yuyuko.anime[4], G.yuyuko.anime[1], 15);
 
 --[[
 	なお、このようなループアニメーションは以下の命令で同様に定義できる。
