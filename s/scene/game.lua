@@ -11,21 +11,21 @@ function game_OnStart ()
 -- 横288 / 12 = 24
 -- 縦128 / 4 = 32
 
-	G.yuyuko.anime = {};
-	G.yuyuko.anime[1] = cutGraphic(G.yuyuko.base, 216, 64, 24, 32);
-	G.yuyuko.anime[2] = cutGraphic(G.yuyuko.base, 240, 64, 24, 32);
-	G.yuyuko.anime[3] = cutGraphic(G.yuyuko.base, 264, 64, 24, 32);
-	G.yuyuko.anime[4] = cutGraphic(G.yuyuko.base, 240, 64, 24, 32);
+	G.yuyuko.walk_down = {};
+	G.yuyuko.walk_down[1] = cutGraphic(G.yuyuko.base, 216, 64, 24, 32);
+	G.yuyuko.walk_down[2] = cutGraphic(G.yuyuko.base, 240, 64, 24, 32);
+	G.yuyuko.walk_down[3] = cutGraphic(G.yuyuko.base, 264, 64, 24, 32);
+	G.yuyuko.walk_down[4] = cutGraphic(G.yuyuko.base, 240, 64, 24, 32);
 
 -- アニメーションの設定をする
-	setGraphicAnime(G.yuyuko.anime[1], G.yuyuko.anime[2], 15);
-	setGraphicAnime(G.yuyuko.anime[2], G.yuyuko.anime[3], 15);
-	setGraphicAnime(G.yuyuko.anime[3], G.yuyuko.anime[4], 15);
-	setGraphicAnime(G.yuyuko.anime[4], G.yuyuko.anime[1], 15);
+	setGraphicAnime(G.yuyuko.walk_down[1], G.yuyuko.walk_down[2], 15);
+	setGraphicAnime(G.yuyuko.walk_down[2], G.yuyuko.walk_down[3], 15);
+	setGraphicAnime(G.yuyuko.walk_down[3], G.yuyuko.walk_down[4], 15);
+	setGraphicAnime(G.yuyuko.walk_down[4], G.yuyuko.walk_down[1], 15);
 
 --[[
 	なお、このようなループアニメーションは以下の命令で同様に定義できる。
-		setGraphicAnimeLoop(G.yuyuko.anime, 15, 1);
+		setGraphicAnimeLoop(G.yuyuko.walk_down, 15, 1);
 	
 	ただしこの場合、アニメーションスピードは全て同一になるので注意。
 ]]
@@ -34,7 +34,7 @@ function game_OnStart ()
 -- この画面上に表示されるもの「全て」をアクターと呼びます。
 -- 背景とて例外ではありません。(今回は出していませんけどね)
 
-	A.yuyuko = createActor(G.yuyuko.anime[1], 320, 240, 4);
+	A.yuyuko = createActor(G.yuyuko.walk_down[1], 320, 240, 4);
 	
 --[[
 	createActorの戻り値はそのアクターを示すハンドル(一意な値)
