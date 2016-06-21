@@ -77,9 +77,6 @@ function game_OnStart ()
 	-- アニメーションの設定をする
 	setGraphicAnimeLoop(G.fire.animation,  15, 1);
 
-	-- 炎表示
-	A.fire = createActor(G.fire.animation[1], 100, 100, LAYER_PLAYER, 'fire');
-
 
 	G.bg = loadGraphic("gfx/seed.jpg");
 

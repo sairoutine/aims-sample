@@ -39,6 +39,12 @@ function mokou_OnStep ()
 		addMover(iSelf(), -1, 1, MOVER_SETFACE, G.yuyuko.walk_down[1]);
 	end
 
+	-- ショット
+	if getJoyPressCount(BUTTON_TRIG1) == 1 then
+		-- playSound(S.pshot)
+		-- 炎表示
+		local a = createActor(G.fire.animation[1], x, y, LAYER_PLAYER, 'fire');
+	end
 end
 
 function mokou_OnClose ()
