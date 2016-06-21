@@ -40,8 +40,7 @@ function mokou_OnStep ()
 	end
 
 	-- ショット
-	if getJoyPressCount(BUTTON_TRIG1) >0 then
-		dm('test')
+	if getJoyPressCount(BUTTON_TRIG1) == 1 then
 		-- playSound(S.pshot)
 		-- 炎表示
 		local a = createActor(G.fire.animation[1], x, y, LAYER_PLAYER, 'fire');
