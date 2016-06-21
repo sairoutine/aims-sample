@@ -56,23 +56,23 @@ function game_OnStart ()
 
 	G.fire.base = loadGraphic("gfx/fire.png");
 
-	-- 初期位置26, 66
+	-- 初期位置66, 26
 	-- 横132 / 6 = 22
 	-- 縦104 / 4 = 26
 
 	-- 画像からグラフィックを切り出す
 	G.fire.animation = {};
-	G.fire.animation[1] = cutGraphic(G.fire.base, 26, 66, 22, 26);
-	G.fire.animation[2] = cutGraphic(G.fire.base, 26, 88, 22, 26);
-	G.fire.animation[3] = cutGraphic(G.fire.base, 26,110, 22, 26);
+	G.fire.animation[1] = cutGraphic(G.fire.base, 66, 26, 22, 26);
+	G.fire.animation[2] = cutGraphic(G.fire.base, 88, 26, 22, 26);
+	G.fire.animation[3] = cutGraphic(G.fire.base,110, 26, 22, 26);
 
-	G.fire.animation[4] = cutGraphic(G.fire.base, 52, 66, 22, 26);
-	G.fire.animation[5] = cutGraphic(G.fire.base, 52, 88, 22, 26);
-	G.fire.animation[6] = cutGraphic(G.fire.base, 52,110, 22, 26);
+	G.fire.animation[4] = cutGraphic(G.fire.base, 66, 52, 22, 26);
+	G.fire.animation[5] = cutGraphic(G.fire.base, 88, 52, 22, 26);
+	G.fire.animation[6] = cutGraphic(G.fire.base,110, 52, 22, 26);
 
-	G.fire.animation[7] = cutGraphic(G.fire.base, 78, 66, 22, 26);
-	G.fire.animation[8] = cutGraphic(G.fire.base, 78, 88, 22, 26);
-	G.fire.animation[9] = cutGraphic(G.fire.base, 78,110, 22, 26);
+	G.fire.animation[7] = cutGraphic(G.fire.base, 66, 52, 22, 26);
+	G.fire.animation[8] = cutGraphic(G.fire.base, 88, 52, 22, 26);
+	G.fire.animation[9] = cutGraphic(G.fire.base,110, 52, 22, 26);
 
 	-- アニメーションの設定をする
 	setGraphicAnimeLoop(G.fire.animation,  15, 1);
