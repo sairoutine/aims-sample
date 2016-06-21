@@ -38,6 +38,7 @@ A = {}; -- 全体から扱いたいアクターのハンドルはこの下に
 prequire("s/scene/game.lua");
 
 prequire("s/chr/mokou.lua");
+prequire("s/chr/fire.lua");
 
 -------------------------------------------
 -- OnLoad　起動直後に呼ばれる

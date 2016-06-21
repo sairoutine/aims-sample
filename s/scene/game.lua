@@ -78,7 +78,7 @@ function game_OnStart ()
 	setGraphicAnimeLoop(G.fire.animation,  15, 1);
 
 	-- ‰Š•\Ž¦
-	A.fire = createActor(G.fire.animation[1], 100, 100, LAYER_PLAYER);
+	A.fire = createActor(G.fire.animation[1], 100, 100, LAYER_PLAYER, 'fire');
 
 
 	G.bg = loadGraphic("gfx/seed.jpg");
