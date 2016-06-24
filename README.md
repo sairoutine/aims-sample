@@ -1,1 +1,1 @@
-# aims-sample
+# aims
